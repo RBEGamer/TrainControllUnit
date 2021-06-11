@@ -10,14 +10,7 @@ CheapStepper stepper_right (7,6,5,4);  //RIGHZ
 int target_i2c_degree_left = 0;
 int target_i2c_degree_right = 0;
 
-int target_left = 0;
-int target_right = 0;
-//CURRENT DEGREE
-int current_left = 0;
-int current_right = 0;
-int dir_left = 0;
-int dir_right = 0;
-int before_set_left = 0;
+
 int before_set_right = 0;
 
 int cmd_read = -1;
@@ -25,6 +18,10 @@ int cmd_counter =0;
 const int CMDLEN = 2;
 int i2ccmd[CMDLEN] = {0, 0}; //LEFT RIGHT
 
+const int ZERO_POINT_LEFT_CAL = 120;
+const int ZERO_POINT_RIGHT_CAL = 120;
+const int ZERO_POINT_LEFT_MAX = 2.2*ZERO_POINT_LEFT_CAL;
+const int ZERO_POINT_RIGHT_MAX = 2.2*ZERO_POINT_RIGHT_CAL;
 void receiveEvent(int howMany)
 {
   cmd_counter = 0;
@@ -46,84 +43,59 @@ void receiveEvent(int howMany)
     }
     cmd_counter++;
   }
-  
+  Serial.println("i1c");
+  Serial.println(target_i2c_degree_left);
   target_i2c_degree_left = i2ccmd[0];
   target_i2c_degree_right  = i2ccmd[1];
-  //map(_target_degree, 0, 255, 0, 270);
+  target_i2c_degree_left = map(target_i2c_degree_left, 0, 100, 0, 270);
+  target_i2c_degree_right = map(target_i2c_degree_right, 0, 100, 0, 270);
   
 }
 
 
-
-void set_target_left(int _target_degree){
-//  Serial.println("current_left:" + String(current_left));
- // Serial.println("_target_degree:" + String(_target_degree));
-  if(_target_degree > 270){_target_degree = 270;}
-  if(_target_degree <= 0){_target_degree = 0;}
+int curr_deg_left = 0;
+int target_degree_left = 0;
+bool dir_left = false;
+void move_left(int dg){
   
-  int td = _target_degree;//;map(_target_degree, 0, 255, 0, 270);
-  int dir = 1;
-  if(_target_degree > current_left){
-    td = td - current_left;
-    dir = 1; //BACKWARD
+   if(dg < 0){dg = 0;}else if(dg > 270){dg = 270;}
+   
+   target_degree_left =  map(dg,0,270,0,ZERO_POINT_LEFT_MAX);
+   if(target_degree_left == curr_deg_left){return;}
+   dir_left = false;
+  if(curr_deg_left < target_degree_left){
+    dir_left = true;
   }
-  else if(_target_degree < current_left){
-    td = current_left -td;
-    dir = 0; //FORWARD
+  stepper_left.moveDegrees (dir_left,abs(curr_deg_left - target_degree_left));
+  curr_deg_left = target_degree_left;
   }
-//  Serial.print("diff: ");
-  if(dir){
- //   Serial.print("+");
-   }else{
-  //  Serial.print("-");
-    }
- // Serial.println(td);
-  if(td != current_left){
-//  stepper_left.newMoveToDegree(dir,td);
-  target_left = td;
-  dir_left = dir;
-  }
-}
 
-void set_target_right(int _target_degree){
-//  Serial.println("current_left:" + String(current_left));
- // Serial.println("_target_degree:" + String(_target_degree));
-  if(_target_degree > 270){_target_degree = 270;}
-  if(_target_degree <= 0){_target_degree = 0;}
+int curr_deg_right = 0;
+int target_degree_right = 0;
+bool dir_right = false;
+void move_right(int dg){
   
-  int td = _target_degree;//;map(_target_degree, 0, 255, 0, 270);
-  int dir = 1;
-  if(_target_degree > current_right){
-    td = td - current_right;
-    dir = 1; //BACKWARD
+   if(dg < 0){dg = 0;}else if(dg > 270){dg = 270;}
+   
+   target_degree_right =  map(dg,0,270,0,ZERO_POINT_RIGHT_MAX);
+   if(target_degree_right == curr_deg_right){return;}
+   dir_right = false;
+  if(curr_deg_right < target_degree_right){
+    dir_right = true;
   }
-  else if(_target_degree < current_right){
-    td = current_right -td;
-    dir = 0; //FORWARD
+  stepper_right.moveDegrees (dir_right,abs(curr_deg_right - target_degree_right));
+  curr_deg_right = target_degree_right;
   }
-//  Serial.print("diff: ");
-  if(dir){
- //   Serial.print("+");
-   }else{
-  //  Serial.print("-");
-    }
- // Serial.println(td);
-  if(td != current_right){
-//  stepper_left.newMoveToDegree(dir,td);
-  target_right = td;
-  dir_right = dir;
-  }
-}
+
 
 const int HALL_PIN_LEFT = 2;
 const int HALL_PIN_RIGHT = 3;
 
 
-const int ZERO_POINT_LEFT_CAL = 120;
-const int ZERO_POINT_RIGHT_CAL = 120;
+
 void setup() {
 
-
+delay(2000);
 pinMode(HALL_PIN_LEFT,INPUT_PULLUP);
 pinMode(HALL_PIN_RIGHT,INPUT_PULLUP);
 Wire.begin(4);                // join i2c bus with address #4
@@ -146,12 +118,7 @@ Wire.onReceive(receiveEvent); // register event
   //Serial.print("stepper delay (micros): "); Serial.print(stepper.getDelay());
   Serial.println(); Serial.println();
 
-  // now let's set up our first move...
-  // let's move a half rotation from the start point
-
-  stepper_left.newMoveToDegree(1,0);
-  current_left = 0;
-
+ 
 
   //MOVE HOME
   int c = 0;
@@ -177,61 +144,22 @@ Wire.onReceive(receiveEvent); // register event
 
   stepper_left.moveDegrees (0,ZERO_POINT_LEFT_CAL);
   stepper_right.moveDegrees (0,ZERO_POINT_RIGHT_CAL);
-  
-  //stepper_right.newMoveToDegree(1,0);
-
-  target_left = 0;
-  target_right = 0;
-  current_left = 0;
-  current_right = 0;
-  before_set_left = 0;
-  before_set_right = 0;
-
- // set_target_left(30);delay(1000);
- // current_left = target_left;
-
+  stepper_left.set4076StepMode();
+  stepper_right.set4076StepMode();
 
   
 }
 
 void loop() {
 
- // Serial.println(digitalRead(HALL_PIN_LEFT));
-  
+
   stepper_left.run();
   stepper_right.run();
 
-
+move_right(target_i2c_degree_left);
+move_left(target_i2c_degree_right);
   
+ Serial.println("TL:" + String(target_i2c_degree_left)+" TR:" + String(target_i2c_degree_right));
 
-
-  // if the current move is done...
-  
-  if (stepper_left.getStepsLeft() <= 0){
-    //delay(5000);
-    current_left = target_i2c_degree_left;
-    //target_i2c_degree_left += 10;
-    set_target_left(target_i2c_degree_left);
-    if(target_left != 0){
-      stepper_left.run();
-      stepper_left.moveDegrees (dir_left, target_left);
-    }else{
-      stepper_left.stop();
-      }
-     
-  }
-
-  if (stepper_right.getStepsLeft() <= 0){
-     //delay(5000);
-    current_right = target_i2c_degree_right;
-    //target_i2c_degree_left += 10;
-    set_target_right(target_i2c_degree_right);
-    if(target_right != 0){
-      stepper_right.run();
-      stepper_right.moveDegrees (dir_left, target_right);
-    }else{
-      stepper_right.stop();
-      }
-  }
-
+ delay(100);
 }

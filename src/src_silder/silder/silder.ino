@@ -82,16 +82,31 @@ void receiveEvent(int howMany)
   Setpoint_BRK  = i2ccmd[1];  
 }
 
+const int STATELEN = 4;
+int i2cstate[STATELEN] = {0, 0, 0, 0};
+void requestEvent()
+{
+  //speichere alle Ist-Werte in dem Array welches über den I2C Bus gesendet werden sollen
+  i2cstate[0] = Input_BRK;
+  i2cstate[1] = Input_VEL;
+  i2cstate[2] = Setpoint_BRK;
+  i2cstate[3] = Setpoint_VEL;
+  
+  //sende das Array mit allen Achsenwerten zum RaspberryPI zurueck
+  for (int i = 0; i < STATELEN; i++)
+  {
+    Wire.write(i2cstate[i]); // respond with message of 6 bytes
+  }
+}
+
 
 void setup()
 {
 
- // Wire.begin(9);
-//   Wire.onReceive(receiveEvent);
   Serial.begin(9600);
   Wire.begin(5);
  Wire.onReceive(receiveEvent); // register event
-  
+  Wire.onRequest(requestEvent); // was tuen wenn Daten angefragt werden
   //initialize the variables we're linked to
   Setpoint_VEL = 15;
   Setpoint_BRK = 0;
@@ -127,7 +142,7 @@ Input2_BRK = 100-Input_BRK;
  //    myPID.Compute();
   //analogWrite(PIN_OUTPUT_A, 0);
 Serial.println(Input_VEL);
-  if(abs(Output_VEL) > 15){ 
+  if(abs(Output_VEL) > 15 && Setpoint_VEL > 0){ 
   if(Output_VEL > 0){
    analogWrite(PIN_OUTPUT_B, abs(Output_VEL));
    analogWrite(PIN_OUTPUT_A, 0);
