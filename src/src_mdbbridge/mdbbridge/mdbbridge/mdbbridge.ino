@@ -8,9 +8,10 @@
 #define MD_MAX_ERR 50
 #define MB_UPDATE_TOKEN 42
 
-const long gauge_interval = 500;
+const long gauge_interval = 700;
 unsigned long gauge_previousMillis = 0;
-
+const long slider_interval = 300;
+unsigned long slider_previousMillis = 0;
 char ssid[] = "ProDevMo";                     
 char pass[] = "6226054527192856";                
 
@@ -30,13 +31,15 @@ void handleData(ModbusMessage response, uint32_t token)
 {
 
   //IF T MB_UPDATE_TOKEN
-  Serial.printf("Response: serverID=%d, FC=%d, Token=%08X, length=%d:\n", response.getServerID(), response.getFunctionCode(), token, response.size());
-  for (auto& byte : response) {
-    Serial.printf("%02X ", byte);
+  //Serial.printf("Response: serverID=%d, FC=%d, Token=%08X, length=%d:\n", response.getServerID(), response.getFunctionCode(), token, response.size());
+  //for (auto& byte : response) {
+ //   Serial.printf("%02X ", byte);
+ // }
+ // Serial.println();
+
+  if(response.size() >= 63){
+    return;
   }
-  Serial.println();
-
-
   const int INDEX_KN = 33;
   const int INDEX_KMH = 13;
    //GET VELOVITY
@@ -92,20 +95,49 @@ void setup() {
   }
   IPAddress wIP = WiFi.localIP();
   Serial.printf("WIFi IP address: %u.%u.%u.%u\n", wIP[0], wIP[1], wIP[2], wIP[3]);
-  
+  Serial.println();
    MB.onDataHandler(&handleData);
    MB.onErrorHandler(&handleError);
    MB.setTimeout(2000, 200);
    MB.begin(1);
    MB.setTarget(IPAddress(192, 168, 178, 24), 5020);
 
-
+  
    
   
 }
 
+//_vel = 0-100, _brk = 0-4
+void send_mdb(int _vel,int _brk){
+  
+  if(_vel <0){_vel = 0;}else if(_vel > 100){_vel = 100;}
+   if(_brk <0){_brk = 0;}else if(_brk > 100){_brk = 100;}
+   
+  _vel = (_vel*2)+900;
+
+  if(_brk > 80){_brk = 4;}
+  else if(_brk > 50){_brk = 3;}
+  else if(_brk > 30){_brk = 2;}
+  else if(_brk >15){_brk = 1;}
+  if(_brk <= 15){_brk = 0;}
 
 
+
+
+
+   Error  err = MB.addRequest((uint32_t)millis(), 1, WRITE_HOLD_REGISTER, 0, _vel);
+  if (err!=SUCCESS) {
+    ModbusError e(err);
+    Serial.printf("Error creating request: %02X - %s\n", (int)e, (const char *)e);
+    Serial.println();
+     err_counter++;
+  if(err_counter > MD_MAX_ERR){
+    ESP.restart();
+    }
+    
+  }
+  
+}
 
 const int STATELEN_SLIDER = 4;
 int i2cstate_slider[STATELEN_SLIDER] = {0, 0, 0, 0};
@@ -138,6 +170,7 @@ void read_md_gauge(){
   if (err!=SUCCESS) {
     ModbusError e(err);
     Serial.printf("Error creating request: %02X - %s\n", (int)e, (const char *)e);
+    Serial.println();
   }
 }
 
@@ -155,8 +188,17 @@ void loop() {
   }
 
        
-  read_i2c_slider();
   
 
-  delay(299);
+  unsigned long slider_currentMillis = millis();
+  if (slider_currentMillis - slider_previousMillis >= slider_interval){        
+        slider_previousMillis = slider_currentMillis;
+        read_i2c_slider();
+        Serial.printf("set_velocity_level %i set_break_level %i",set_velocity_level,set_break_level);
+        Serial.println();
+        send_mdb(set_velocity_level,set_break_level);
+  }
+  
+
+  delay(50);
 }
