@@ -1,11 +1,11 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include "ModbusClientTCP.h"
-
+#include <vector>
 
 #define I2C_ADDR_SLIDER 5
 #define I2C_ADDR_GAUGE 4
-
+#define MD_MAX_ERR 50
 #define MB_UPDATE_TOKEN 42
 
 const long gauge_interval = 500;
@@ -13,6 +13,13 @@ unsigned long gauge_previousMillis = 0;
 
 char ssid[] = "ProDevMo";                     
 char pass[] = "6226054527192856";                
+
+
+int get_velocity_level = 0;
+int get_break_level = 0;
+
+int set_velocity_level = 0;
+int set_break_level = 0;
 
 
 WiFiClient theClient; 
@@ -27,14 +34,43 @@ void handleData(ModbusMessage response, uint32_t token)
   for (auto& byte : response) {
     Serial.printf("%02X ", byte);
   }
-  Serial.println("");
+  Serial.println();
+
+
+  const int INDEX_KN = 33;
+  const int INDEX_KMH = 13;
+   //GET VELOVITY
+  int number = response[INDEX_KN+1] | response[INDEX_KN] << 8;
+
+   if(number >= 80 && number < 120){
+     number = map(number,80,120,0,100);
+    get_velocity_level = number;
+  }
+  
+
+  //KMH
+  number = response[INDEX_KMH+1] | response[INDEX_KMH] << 8;
+  number = map(number/100,0,15,0,100);
+  if(number >= 0 && number < 20){
+  get_break_level = number;
+  }
+  
+  Serial.printf("get_velocity_level %i get_break_level %i",get_velocity_level,get_break_level);
+  Serial.println();
 }
 
+
+int err_counter = 0;
 void handleError(Error error, uint32_t token) 
 {
   // ModbusError wraps the error code and provides a readable error message for it
   ModbusError me(error);
   Serial.printf("Error response: %02X - %s\n", (int)me, (const char *)me);
+
+  err_counter++;
+  if(err_counter > MD_MAX_ERR){
+    ESP.restart();
+    }
 }
 
 
@@ -60,15 +96,15 @@ void setup() {
    MB.onDataHandler(&handleData);
    MB.onErrorHandler(&handleError);
    MB.setTimeout(2000, 200);
-   MB.begin();
+   MB.begin(1);
    MB.setTarget(IPAddress(192, 168, 178, 24), 5020);
+
+
+   
+  
 }
 
-int get_velocity_level = 0;
-int get_break_level = 0;
 
-int set_velocity_level = 0;
-int set_break_level = 0;
 
 
 const int STATELEN_SLIDER = 4;
@@ -98,11 +134,11 @@ void set_gauge(int _vel, int _brk){
 
 
 void read_md_gauge(){
-Error err = MB.addRequest(MB_UPDATE_TOKEN, 30, READ_HOLD_REGISTER, 0, 30);
+ Error err = MB.addRequest((uint32_t)millis(), 20, READ_HOLD_REGISTER, 0, 30);
   if (err!=SUCCESS) {
     ModbusError e(err);
     Serial.printf("Error creating request: %02X - %s\n", (int)e, (const char *)e);
-  }  
+  }
 }
 
 
