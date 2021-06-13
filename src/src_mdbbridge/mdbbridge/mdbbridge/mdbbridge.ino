@@ -20,13 +20,17 @@ const int MB_REGISTER_KN = 15; //GET!!
 //SLIDER REGISTER
 const int MB_REGISTER_BRKLVL = 0; //5-100 SET!!
 const int MB_REGISTER_VEL = 1; //2*+900 SET!!
-
+//BTN REGGISTER
+const int MB_REGISTER_EMGSTOP =28;
+const int MB_REGISTER_ALARM = 29;
 
 //TIMER VARIABLES
 const long gauge_interval = 500;
 unsigned long gauge_previousMillis = 0;
 const long slider_interval = 150;
 unsigned long slider_previousMillis = 0;
+const long btn_interval = 50;
+unsigned long btn_previousMillis = 0;
 
 //CHACHE VARIABLES
 uint16_t get_velocity_level = 0;
@@ -47,6 +51,9 @@ ModbusIP mb;  //ModbusIP object
 #define I2C_ADDR_SLIDER 5
 #define I2C_ADDR_GAUGE 4
 
+//BTN PINS ASSIGNMENT
+const int BTN_EMG_STOP = 2;
+const int BTN_ALARM = 4;
 
 const int STATELEN_SLIDER = 4;
 int i2cstate_slider[STATELEN_SLIDER] = {0, 0, 0, 0};
@@ -93,6 +100,12 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
+
+  
+  pinMode(BTN_EMG_STOP, INPUT_PULLUP);
+  pinMode(BTN_ALARM, INPUT_PULLUP);
+
+  
   mb.client();
   mb.connect(remote,remote_port);           // Try to connect if no connection 
 
@@ -149,6 +162,20 @@ void loop() {
             Serial.println("MB_REGISTER_VEL SET FAILED");
           }
   }
+
+
+   unsigned long btn_currentMillis = millis();
+  if (btn_currentMillis - btn_previousMillis >= btn_interval){        
+          btn_previousMillis = btn_currentMillis;
+          
+          if(!mb.writeHreg(remote, MB_REGISTER_EMGSTOP, digitalRead(BTN_EMG_STOP))){
+            Serial.println("MB_REGISTER_BRKLVL SET FAILED");
+          }
+          if(!mb.writeHreg(remote, MB_REGISTER_ALARM, digitalRead(BTN_ALARM))){
+            Serial.println("MB_REGISTER_VEL SET FAILED");
+          }
+  }
+  
 
   
  
