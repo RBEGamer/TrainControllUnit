@@ -141,7 +141,7 @@ Input2_BRK = 100-Input_BRK;
 
  //    myPID.Compute();
   //analogWrite(PIN_OUTPUT_A, 0);
-Serial.println(Input_VEL);
+Serial.println("V" + String(Input_VEL) + " B" + String(Input_BRK));
   if(abs(Output_VEL) > 15 && Setpoint_VEL > 0){ 
   if(Output_VEL > 0){
    analogWrite(PIN_OUTPUT_B, abs(Output_VEL));
