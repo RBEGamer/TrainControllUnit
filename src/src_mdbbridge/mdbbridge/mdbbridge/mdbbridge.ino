@@ -52,8 +52,8 @@ ModbusIP mb;  //ModbusIP object
 #define I2C_ADDR_GAUGE 4
 
 //BTN PINS ASSIGNMENT
-const int BTN_EMG_STOP = 2;
-const int BTN_ALARM = 4;
+const int BTN_EMG_STOP = 15;
+const int BTN_ALARM =4;
 
 const int STATELEN_SLIDER = 4;
 int i2cstate_slider[STATELEN_SLIDER] = {0, 0, 0, 0};
