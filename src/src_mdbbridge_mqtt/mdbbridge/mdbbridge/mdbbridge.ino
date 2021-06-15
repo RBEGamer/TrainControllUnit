@@ -11,23 +11,17 @@
 #else
  #include <WiFi.h>
 #endif
-#include <ModbusIP_ESP8266.h>
+#include <PubSubClient.h>
 #include <Wire.h>
 
-//GAUGE REGISTER
-const int MB_REGISTER_KMH =  3; //GET!!
-const int MB_REGISTER_KN = 15; //GET!!
-//SLIDER REGISTER
-const int MB_REGISTER_BRKLVL = 0; //5-100 SET!!
-const int MB_REGISTER_VEL = 1; //2*+900 SET!!
-//BTN REGGISTER
-const int MB_REGISTER_EMGSTOP =28;
-const int MB_REGISTER_ALARM = 29;
+#define MQTT_TOPIC_SEND_EVENT "remote_control_event"
+
+
 
 //TIMER VARIABLES
-const long gauge_interval = 500;
+const long gauge_interval =300;
 unsigned long gauge_previousMillis = 0;
-const long slider_interval = 150;
+const long slider_interval = 100;
 unsigned long slider_previousMillis = 0;
 const long btn_interval = 50;
 unsigned long btn_previousMillis = 0;
@@ -43,9 +37,12 @@ char ssid[] = "emma2019";
 char pass[] = "emma2019";
 
 //MODBUS SERVER CONFIG
-IPAddress remote(192, 168, 1, 17);  // Address of Modbus Slave device
-const int remote_port = 5020;
-ModbusIP mb;  //ModbusIP object
+IPAddress remote(192, 168, 1, 43);  // Address of Modbus Slave device
+
+WiFiClient espClient;
+PubSubClient mqtt_client(espClient);
+
+
 
 //I2C BUS SLAVE ADDR CONFIG
 #define I2C_ADDR_SLIDER 5
@@ -84,6 +81,37 @@ void set_gauge(int _vel, int _brk){
 
   
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i=0;i<length;i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!mqtt_client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (mqtt_client.connect("arduinoClient")) {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      
+      // ... and resubscribe
+      //mqtt_client.subscribe("remote_control_setpoint");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(mqtt_client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
 
 void setup() {
   Serial.begin(9600);
@@ -106,23 +134,27 @@ void setup() {
   pinMode(BTN_ALARM, INPUT_PULLUP);
 
   
-  mb.client();
-  mb.connect(remote,remote_port);           // Try to connect if no connection 
-
+  mqtt_client.setServer(remote, 1883);
+  mqtt_client.setCallback(callback);
   
 }
+
+
+int last_set_velocity_level = -1;
+int last_set_break_level = -1;
+
 
 bool gauges_updates = true; //PERFOMRS A INITIAL UPDATE
 
 void loop() {
 
-   mb.task();                      // Common local Modbus task
+    if (!mqtt_client.connected()) {
+    reconnect();
+  }
+  mqtt_client.loop();
 
    
-  if (!mb.isConnected(remote)) {   // Check if connection to Modbus Slave is established
-    mb.connect(remote,remote_port);           // Try to connect if no connection 
-    return;
-  }
+ 
 
 
   //GAUGE UPDATE LOOP
@@ -130,15 +162,16 @@ void loop() {
   if (gauge_currentMillis - gauge_previousMillis >= gauge_interval){        
         gauge_previousMillis = gauge_currentMillis;
         //READ MODBUS
-        if(mb.readHreg(remote, MB_REGISTER_KMH, &get_velocity_level)){
-          gauges_updates = true;
-        }
-         if(mb.readHreg(remote, MB_REGISTER_KN, &get_break_level)){
-          gauges_updates = true;
-        }
-        if(gauges_updates){
-          set_gauge(get_velocity_level,get_break_level);
-        }
+     //   if(mb.readHreg(remote, MB_REGISTER_KMH, &get_velocity_level)){
+     //     gauges_updates = true;
+     //   }
+     //    if(mb.readHreg(remote, MB_REGISTER_KN, &get_break_level)){
+     //     gauges_updates = true;
+     //   }
+     //   if(gauges_updates){
+     //     set_gauge(get_velocity_level,get_break_level);
+     //   }
+     
   }
 
   
@@ -154,13 +187,22 @@ void loop() {
           else if(set_break_level_conv > 30){set_break_level_conv = 2;}
           else if(set_break_level_conv >15){set_break_level_conv = 1;}
           else if(set_break_level_conv <= 15){set_break_level_conv = 0;}
-  
+
+          if(set_velocity_level != last_set_velocity_level || set_break_level != last_set_break_level){
+            String tmp = "{\"breaklevel\":"+String(set_break_level_conv)+",\"velocity\":"+String(set_velocity_level)+"}";
+            int ssid_len = tmp.length() + 1;
+            char ssid_array[ssid_len];
+            tmp.toCharArray(ssid_array, ssid_len);
+            mqtt_client.publish(MQTT_TOPIC_SEND_EVENT, ssid_array);
+          }
+  /*
           if(!mb.writeHreg(remote, MB_REGISTER_BRKLVL, set_break_level_conv)){
             Serial.println("MB_REGISTER_BRKLVL SET FAILED");
           }
           if(!mb.writeHreg(remote, MB_REGISTER_VEL, (2*set_velocity_level)+900)){
             Serial.println("MB_REGISTER_VEL SET FAILED");
           }
+          */
   }
 
 
@@ -168,12 +210,12 @@ void loop() {
   if (btn_currentMillis - btn_previousMillis >= btn_interval){        
           btn_previousMillis = btn_currentMillis;
           
-          if(!mb.writeHreg(remote, MB_REGISTER_EMGSTOP, digitalRead(BTN_EMG_STOP))){
-            Serial.println("MB_REGISTER_BRKLVL SET FAILED");
-          }
-          if(!mb.writeHreg(remote, MB_REGISTER_ALARM, digitalRead(BTN_ALARM))){
-            Serial.println("MB_REGISTER_VEL SET FAILED");
-          }
+       //   if(!mb.writeHreg(remote, MB_REGISTER_EMGSTOP, digitalRead(BTN_EMG_STOP))){
+       //     Serial.println("MB_REGISTER_BRKLVL SET FAILED");
+       //   }
+       //   if(!mb.writeHreg(remote, MB_REGISTER_ALARM, digitalRead(BTN_ALARM))){
+       //     Serial.println("MB_REGISTER_VEL SET FAILED");
+       //   }
   }
   
 
