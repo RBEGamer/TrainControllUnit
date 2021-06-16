@@ -1,0 +1,856 @@
+<html>
+
+<head>
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, shrink-to-fit=yes, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>LC</title>
+
+
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/small-business.css" rel="stylesheet">
+
+
+
+    <style>
+        body {
+            background-color: rgb(44, 43, 43);
+        }
+
+        .my-sidebar {
+            -ms-flex: 0 0 800;
+            flex: 0 0 800;
+            background-color: greenyellow;
+        }
+
+        .gauge_text {
+            font-weight: 900;
+            color: aliceblue;
+            font-size: 1.6em;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+
+    <div class="container-fluid" style="max-width: 1280;">
+
+
+        <div class="row" style="border:2px solid white;">
+
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                    id="img_brkloes_two" onclick="change_brkloes(2)" />
+            </div>
+
+
+            <div class="col-md-1 col-md-offset-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                     id="img_v0" onclick="change_breakingstep(1);"/>
+            </div>
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                     id="img_v1" onclick="change_breakingstep(2);"/>
+            </div>
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                    id="img_v2" onclick="change_breakingstep(3);"/>
+            </div>
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                     id="img_v3" onclick="change_breakingstep(4);"/>
+            </div>
+
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                     id="img_fire" onclick="clear_fire_sound();"/>
+            </div>
+
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                     id="img_direction" onclick="change_direction()" />
+            </div>
+
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                    id="img_ctlmode" onclick="change_ctlmode()" />
+            </div>
+
+
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                    id="img_asc" onclick="change_asc()" />
+            </div>
+
+
+             <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                     id="img_komp" onclick="change_kompressormode()" />
+            </div>
+
+
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                     id="img_engery" onclick="change_engmode()" />
+            </div>
+
+           
+
+            
+            <div class="col-md-1">
+                <img class="img-responsive" src="/img/new_icons/icon_150x150_undef.png" width="75"
+                    id="img_brkloes_one" onclick="change_brkloes(1)" />
+            </div>
+
+
+            
+        </div>
+
+
+        <!-- Heading Row -->
+        <div class="row" style="border:2px solid white;">
+            <div class="col-md-6 col-md-offset-1" style="border:2px solid white;">
+                <canvas id="canvas1" width="600" height="300">
+                    Your browser does not support the canvas element.
+                </canvas>
+            </div>
+            <div class="col-md-6 col-md-offset-1" style="border:2px solid white;">
+                <canvas id="canvas2" width="600" height="300">
+                    Your browser does not support the canvas element.
+                </canvas>
+            </div>
+        </div>
+
+
+        <div class="row" style="border:2px solid white;">
+            <div class="col-md-6 col-md-offset-1 center-block text-center" style="border:2px solid white;">
+                <span class="gauge_text" id="gauge_kmh_text">0</span>
+            </div>
+            <div class="col-md-6 col-md-offset-1 center-block text-center" style="border:2px solid white;">
+                <span class="gauge_text" id="gauge_kn_text">0</span>
+            </div>
+        </div>
+
+
+        <div class="row" style="border:2px solid white;">
+            <div class="col-md-6 col-md-offset-1 center-block text-center" style="border:2px solid white;">
+
+                <div id="dist_left_box_cont"></div>
+            </div>
+            <div class="col-md-6 col-md-offset-1 center-block text-center" style="border:2px solid white;">
+                <button type="button" class="btn btn-info" id="chgaugtwo_kn" onclick="sw_gauge_mode_two('kn');"> KN
+                </button>
+
+                <button type="button" class="btn btn-info" id="chgaugtwo_batt" onclick="sw_gauge_mode_two('batt');">BATTERY</button>
+
+                <button type="button" class="btn btn-info" id="chgaugtwo_temp" onclick="sw_gauge_mode_two('temp');">TEMPERATURE</button>
+
+                <button type="button" class="btn btn-info" id="chgaugtwo_bar" onclick="sw_gauge_mode_two('bar');">PRESSURE</button>
+
+
+
+                
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-6 col-md-offset-1" >
+                <img class="img-responsive img-center" src="/img/new_icons/icon_512x128_Notbremse.png" width="400" id="img_notbremse" onclick="send_notbremse()" />
+            </div>
+
+            <div class="col-md-6 col-md-offset-1" >
+                    <img class="img-responsive img-center" width="400" src="/img/new_icons/icon_512x128_hupe_big.png"  id="img_hupe" onmousedown="hupe(1)" onmouseup="hupe(0)" />
+                </div>
+        </div>
+
+
+      
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-1" style="border:2px solid white;" id="alert_box">
+                &nbsp;
+                <div class="alert alert-primary" role="alert" id="alert_box">
+                    NO MESSAGES AVARIABLE
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+       
+
+
+        <!-- Bootstrap core JavaScript -->
+        <script src="vendor/jquery/jquery.min.js"></script>
+        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="js/204socket.io.js"></script>
+        <script src="js/gauge.js"></script>
+
+
+
+
+        <script>
+
+var firesound = new Audio('./audio/fire.mp3');
+var firesound_clear = new Audio('./audio/fire_clear.mp3');
+
+var embrakeactivatedsound = new Audio('./audio/embrake_activated.mp3');
+
+var forwardsound = new Audio('./audio/forward.mp3');
+var backwardsound = new Audio('./audio/backward.mp3');
+
+
+var modecurrentsound = new Audio('./audio/mode_current.mp3');
+var moderpmsound = new Audio('./audio/mode_rpm.mp3');
+
+var directionchangesoundplayed = false;
+
+var last_breaklevel = -1;
+
+
+var last_direction = false;
+    var last_guage_mode = "";
+            var opts_kmh = {
+                angle: 0, // The span of the gauge arc
+                lineWidth: 0.44, // The line thickness
+                radiusScale: 1, // Relative radius
+                pointer: {
+                    length: 0.5, // // Relative to gauge radius
+                    strokeWidth: 0.035, // The thickness
+                    color: '#FFFFFF' // Fill color
+                },
+                limitMax: true,     // If false, max value increases automatically if value > maxValue
+                limitMin: true,     // If true, the min value of the gauge will be fixed
+                colorStart: '#6FADCF',   // Colors
+                colorStop: '#8FC0DA',    // just experiment with them
+                strokeColor: '#E0E0E0',  // to see which ones work best for you
+                generateGradient: true,
+                highDpiSupport: true,     // High resolution support
+
+            };
+
+            var opts_kn = {
+                angle: 0, // The span of the gauge arc
+                lineWidth: 0.44, // The line thickness
+                radiusScale: 1, // Relative radius
+                pointer: {
+                    length: 0.5, // // Relative to gauge radius
+                    strokeWidth: 0.035, // The thickness
+                    color: '#FFFFFF' // Fill color
+                },
+                limitMax: true,     // If false, max value increases automatically if value > maxValue
+                limitMin: true,     // If true, the min value of the gauge will be fixed
+                colorStart: '#E0E0E0',   // Colors
+                colorStop: '#E0E0E0',    // just experiment with them
+                strokeColor: '#E0E0E0',  // to see which ones work best for you
+                generateGradient: true,
+                highDpiSupport: true,     // High resolution support
+
+            };
+
+
+            var target1 = document.getElementById('canvas2'); // your canvas element
+            var gauge_kn = new Gauge(target1).setOptions(opts_kn); // create sexy gauge!
+            gauge_kn.maxValue = 20; // set max gauge value
+            gauge_kn.setMinValue(-20);  // Prefer setter over gauge.minValue = 0
+            gauge_kn.animationSpeed = 32; // set animation speed (32 is default value)
+            gauge_kn.set(0); // set actual value
+
+            var target2 = document.getElementById('canvas1'); // your canvas element
+            var gauge_kmh = new Gauge(target2).setOptions(opts_kmh); // create sexy gauge!
+            gauge_kmh.maxValue = 15.0; // set max gauge value
+            gauge_kmh.setMinValue(0);  // Prefer setter over gauge.minValue = 0
+            gauge_kmh.animationSpeed = 32; // set animation speed (32 is default value)
+            gauge_kmh.set(0); // set actual value
+            //TODO SET KMH TEXT TO 0
+
+            var elem_hupe = document.getElementById('img_hupe');
+            
+            elem_hupe.addEventListener('touchstart',function(_event){
+                hupe(1);
+            });
+
+            elem_hupe.addEventListener('touchend',function(_event){
+                hupe(0);
+            });
+
+            elem_hupe.addEventListener('mousedown',function(_event){
+                hupe(1);
+            });
+
+            elem_hupe.addEventListener('mouseup',function(_event){
+                hupe(0);
+            });
+
+            document.addEventListener('keydown',function(event){
+                if(event.keyCode == 49){
+                    change_breakingstep(1);
+                }else if(event.keyCode == 50){
+                    change_breakingstep(2)
+                } if(event.keyCode == 51){
+                    change_breakingstep(3)
+                } if(event.keyCode == 52){
+                    change_breakingstep(4)
+                } if(event.keyCode == 48){
+                    change_breakingstep(0)
+                }
+
+            })
+            var socket = null;
+
+            var fire_detection_sound_intervall = null;
+            var fire_detection_last_state = false;
+            var fire_sound_cleared = false;
+            var chmoderpm_switched = false;
+            //SET TO BG IMG_SIZE
+             var enmodecc = 0;
+
+            function change_direction() {
+                socket.emit('event', { 'event': 'dirch' });
+                enmodecc = 0;
+            }
+
+            function change_ctlmode() {
+                socket.emit('event', { 'event': 'ctlmode' });
+                enmodecc =0; 
+            }
+            function change_asc() {
+                socket.emit('event', { 'event': 'asc' });
+                enmodecc =0;
+            }
+
+            function change_kompressormode(){
+                socket.emit('event', { 'event': 'kompmode' });
+                enmodecc = 0;
+            }
+
+
+            function send_notbremse(){
+                socket.emit('event', { 'event': 'embreak' });
+                enmodecc =0;
+            }
+
+            function change_lightmode(){
+                socket.emit('event', { 'event': 'lightmode' });
+                enmodecc = 0;
+            }
+
+           
+            function change_engmode(){
+                enmodecc++;
+
+                if(enmodecc > 1){
+                    socket.emit('event', { 'event': 'engmode' });
+                    enmodecc = 0;
+
+                }
+                
+            }
+
+            var brkloes_one_ok = false;
+            var brkloes_two_ok = false;
+            var embrk_release_timer = false;
+            var embrk_release_timeout = null;
+            var embrk_timer_started = false;
+            var embrkok_ts = false;
+            function change_brkloes(_var){
+                 if(last_breaklevel != -4){
+                         show_alert("PLEASE SET BREAKLEVEL TO 4", true);
+                    }
+                enmodecc =0;
+                if(!brkloes_one_ok && _var == 1){
+                    brkloes_one_ok = true;
+                   
+                }
+                if(!brkloes_two_ok && _var == 2){
+                    brkloes_two_ok = true;
+                   
+                }
+
+                if(brkloes_two_ok && brkloes_one_ok){
+                   
+                    if(!embrkok_ts){
+                        embrkok_ts = true;
+                        setTimeout(() => {
+                            brkloes_one_ok = false;
+                            brkloes_one_ok = false;
+                            socket.emit('event', { 'event': 'brkloes' });
+
+                            $("#img_brkloes_one").attr("src", "/img/new_icons/icon_150x150_Notbremse_bereit.png");
+                            $("#img_brkloes_two").attr("src", "/img/new_icons/icon_150x150_Notbremse_bereit.png");
+                           show_alert("",false);
+                        }, 1000);
+                    }         
+                }
+
+               
+               
+
+                //TODO
+              
+                // TODO !!!
+            }
+            
+
+
+            
+            function hupe(_state){
+                socket.emit('event', { 'event': 'hupe','state':_state });
+            }
+
+            function clear_fire_sound(){
+                if(!fire_sound_cleared){
+                    clearInterval(fire_detection_sound_intervall);
+                    firesound_clear.play();
+                    fire_sound_cleared  = true;
+                }  
+            }
+           
+
+         //   $("#img_hupe").addEventListener('touchstart',function(event){alert('a');});
+       //     $("#img_hupe").addEventListener('touchend',function(event){alert('b');});
+           
+
+            var gauge_two_mode = "bar"; //bar kn batt temp
+
+            function sw_gauge_mode_two(_btn_id) {
+                gauge_two_mode = _btn_id;
+            }
+
+            function change_breakingstep(_var) {
+
+                if(_var == 0){
+                     socket.emit('event', { 'event': 'brkstep0' });
+                }else  if(_var == 1){
+                     socket.emit('event', { 'event': 'brkstep1' });
+                }else  if(_var == 2){
+                     socket.emit('event', { 'event': 'brkstep2' });
+                }else  if(_var == 3){
+                     socket.emit('event', { 'event': 'brkstep3' });
+                }else  if(_var == 4){
+                     socket.emit('event', { 'event': 'brkstep4' });
+                }
+               
+            }
+            function show_alert(_msg, _is_err = false) {
+                if (!_is_err) {
+                    $("#alert_box").html("&nbsp; <div class='alert alert-primary' role='alert' id='alert_box'>" + _msg + "</div>");
+                } else {
+                    $("#alert_box").html("&nbsp; <div class='alert alert-danger' role='alert' id='alert_box'>" + _msg + "</div>");
+                }
+            }
+
+
+
+
+            function switch_image(_id, _state) {
+                var th = $("#img_" + _id);
+                if (th == null || _state == null || _id == null) {
+                    th.attr("src", "/img/zusi_icons/np_error.png");
+                    console.log("INVALID STATE IMAGE:" + _id + " s:" + _state)
+                    return;
+                }
+
+                th.attr("src", "/img/zusi_icons/" + String(_id) + "_" + String(_state) + ".png");
+            }
+
+            var old_alert_msg = "";
+            var fahrtrichtungtext = "---";
+            var chmodeicon_switched = false;
+            var fire_blink = false;
+            function parse_state_data(_data) {
+
+                if (_data == null || _data.display == null) {
+                    show_alert("DATA STATE PARSING FAILED")
+                }
+                console.log(_data);
+
+                //UPDATE GAUGES
+                if (_data.display.breaklevel != undefined && _data.display.breaklevel != null) {
+                    last_breaklevel = _data.display.breaklevel;
+                }
+                
+
+
+
+
+                if (_data.display.lightstate != undefined && _data.display.lightstate != null) {
+                    if (_data.display.lightstate) {
+                        $("#img_light").attr("src", "/img/new_icons/icon_150x150_lights_A_on_front.png");
+                    } else{
+                        $("#img_light").attr("src", "/img/new_icons/icon_150x150_lights_A_off.png");
+                    }
+                } else {
+                    $("#img_light").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+
+                if (_data.display.kompressorstate != undefined && _data.display.kompressorstate != null) {
+                    if (_data.display.kompressorstate == 1) {
+                        $("#img_komp").attr("src", "/img/new_icons/icon_150x150_comp_on.png");
+                    } else if (_data.display.kompressorstate == 0) {
+                        $("#img_komp").attr("src", "/img/new_icons/icon_150x150_comp_off.png");
+                    }else{
+                        if(_data.display.kompressor_power_state){
+                            $("#img_komp").attr("src", "/img/new_icons/icon_150x150_comp_on.png");
+                        }else{
+                            $("#img_komp").attr("src", "/img/new_icons/icon_150x150_comp_on_auto.png");
+                        }
+                       
+                    }
+                } else {
+                    $("#img_komp").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+
+
+
+                if (_data.display.state_v0 != undefined && _data.display.state_v0 != null) {
+                    if (!_data.display.state_v0) {
+                        $("#img_v0").attr("src", "/img/new_icons/icon_150x150_brake_1_on.png");
+                    } else {
+                        $("#img_v0").attr("src", "/img/new_icons/icon_150x150_brake_1_off.png");
+                    }
+                } else {
+                    $("#img_v0").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+
+                if (_data.display.state_v1 != undefined && _data.display.state_v1 != null) {
+                    if (!_data.display.state_v1) {
+                        $("#img_v1").attr("src", "/img/new_icons/icon_150x150_brake_2_on.png");
+                    } else {
+                        $("#img_v1").attr("src", "/img/new_icons/icon_150x150_brake_2_off.png");
+                    }
+                } else {
+                    $("#img_v1").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+
+                if (_data.display.state_v2 != undefined && _data.display.state_v2 != null) {
+                    if (!_data.display.state_v2) {
+                        $("#img_v2").attr("src", "/img/new_icons/icon_150x150_brake_3_on.png");
+                    } else {
+                        $("#img_v2").attr("src", "/img/new_icons/icon_150x150_brake_3_off.png");
+                    }
+                } else {
+                    $("#img_v2").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+
+                if (_data.display.state_v3 != undefined && _data.display.state_v3 != null) {
+                    if (!_data.display.state_v3) {
+                        $("#img_v3").attr("src", "/img/new_icons/icon_150x150_brake_4_on.png");
+                    } else {
+                        $("#img_v3").attr("src", "/img/new_icons/icon_150x150_brake_4_off.png");
+                    }
+                } else {
+                    $("#img_v3").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+
+
+
+                if (_data.display.hupe_state != undefined && _data.display.hupe_state != null) {
+                    if (!_data.display.hupe_state) {
+                        $("#img_hupe").attr("src", "/img/new_icons/icon_512x128_hupe_big_on.png");
+                    } else {
+                        $("#img_hupe").attr("src", "/img/new_icons/icon_512x128_hupe_big.png");
+                    }
+                } else {
+                    $("#img_hupe").attr("src", "/img/new_icons/icon_512x128_hupe_big.png");
+                }
+
+                if (_data.display.emergencybrake != undefined && _data.display.emergencybrake != null) {
+                    if (_data.display.emergencybrake == 1) {
+                        $("#img_brkloes_one").attr("src", "/img/new_icons/icon_150x150_Notbremse_bereit.png");
+                        $("#img_brkloes_two").attr("src", "/img/new_icons/icon_150x150_Notbremse_bereit.png");
+
+      
+                           
+                        brkloes_one_ok = false;
+                        brkloes_two_ok = false;
+                        embrk_release_timer = false;
+                        embrk_timer_started = false;
+                        embrkok_ts = false;
+                    } else if (_data.display.emergencybrake == 0) {
+
+                       // if (embrk_release_timer) {
+                            if(brkloes_one_ok){
+                                $("#img_brkloes_one").attr("src", "/img/new_icons/icon_150x150_Notbremse_bereit.png");
+                            }else{
+                                $("#img_brkloes_one").attr("src", "/img/new_icons/icon_150x150_Notbremse_Rueckstellen.png");
+                            }
+
+                            if(brkloes_two_ok){
+                               
+                                $("#img_brkloes_two").attr("src", "/img/new_icons/icon_150x150_Notbremse_bereit.png");
+                            }else{
+                                $("#img_brkloes_two").attr("src", "/img/new_icons/icon_150x150_Notbremse_Rueckstellen.png");
+                            }
+                     
+                    }
+                } else {
+                    $("#img_brkloes_one").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                    $("#img_brkloes_two").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                    brkloes_one_ok = false;
+                    brkloes_one_ok = false;
+                    embrk_release_timer = false;
+                    embrk_timer_started = false;
+                    embrkok_ts = false;
+                }
+
+
+                 //icon_150x150_energyrecovery_off.png img_engery   
+                 if (_data.display.storemode != undefined && _data.display.storemode != null) {
+                     if(_data.display.storemode == 0){
+                         $("#img_engery").attr("src", "/img/new_icons/icon_150x150_energyrecovery_off.png");
+                     }else if(_data.display.storemode == 1){
+                          $("#img_engery").attr("src", "/img/new_icons/icon_150x150_energyrecovery_in.png");
+                    }else if(_data.display.storemode == 2){
+                          $("#img_engery").attr("src", "/img/new_icons/icon_150x150_energyrecovery_out.png");
+                    }
+                 }
+                if (_data.display.fire_detcted != undefined && _data.display.fire_detcted != null) {
+                    if (_data.display.fire_detcted) {
+                        $("#img_fire").attr("src", "/img/new_icons/icon_150x150_fire_on_a.png");
+
+
+                        if (fire_detection_last_state != _data.display.fire_detcted) {
+                            fire_detection_last_state = _data.display.fire_detcted;
+                            fire_sound_cleared = false;
+                            if (fire_detection_last_state) {
+                                fire_detection_sound_intervall = setInterval(() => { 
+                                   
+
+                                    if(fire_blink){
+                                 
+                                        $("#img_fire").attr("src", "/img/new_icons/icon_150x150_fire_on_a.png");
+                                    }else{
+                           
+                                        $("#img_fire").attr("src", "/img/new_icons/icon_150x150_fire_on_b.png");
+                                    }
+                                    fire_blink = !fire_blink;
+
+                                    firesound.play(); 
+                                }, 2000);
+
+                            } else {
+                                clearInterval(fire_detection_sound_intervall);
+                            }
+                        }
+
+                    } else {
+                        $("#img_fire").attr("src", "/img/new_icons/icon_150x150_fire_off.png");
+                        clearInterval(fire_detection_sound_intervall);
+                        fire_detection_last_state = false;
+                        fire_sound_cleared = false;
+                    }
+                } else {
+                    $("#img_fire").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                    clearInterval(fire_detection_sound_intervall);
+                    fire_detection_last_state = false;
+                    fire_sound_cleared = false;
+                }
+
+
+
+                if(_data.display.storedenergy != undefined && _data.display.storedenergy != null){
+                    if(_data.display.storedenergy > 0.0){
+                        $("#dist_left_box_cont").html("<span style='color: #FFFFFF;font-size:24px;'>" + "STORED ENERGY : <b>" + _data.display.storedenergy + "</b>  Wh" + "</span>");
+                    }
+                }
+
+
+                if (_data.display.asc_state != undefined && _data.display.asc_state != null) {
+                    if (_data.display.asc_state == 0) {
+                        $("#img_asc").attr("src", "/img/new_icons/icon_150x150_autostop_off.png");
+                    } else if (_data.display.asc_state == 1) {
+                        $("#img_asc").attr("src", "/img/new_icons/icon_150x150_autostop_on.png");
+                    } else if (_data.display.asc_state == 2) {
+                        $("#img_asc").attr("src", "/img/new_icons/icon_150x150_autostop_on_detected.png");
+                    }
+
+                    if (_data.display.asc_rest_dist != undefined && _data.display.asc_rest_dist != null &&  _data.display.asc_state == 2) { 
+                        $("#dist_left_box_cont").html("<span style='color: #FFFFFF;font-size:24px;'>" + "DISTANCE TO STOP LEFT : <b>" + _data.display.asc_rest_dist + "</b> m" + "</span>");
+                    }else{
+                        //$("#dist_left_box_cont").html("");
+                    }
+                } else {
+                    $("#img_asc").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+
+
+
+// TODO AKTIVER BUTTON FÄRBEN
+// TODO emergencybrake + button einbauen
+//TODO BATTER RÜCKSPEISUN EINBAUEN + RESET + AUF DEFAULT WERT SETZTEN
+
+                if (gauge_two_mode == "kn") {
+
+                    if((_data.display.kn*0.001)<60.0){
+                        $("#gauge_kn_text").html(String(_data.display.kn*0.001) + " KN");
+                        gauge_kn.set(_data.display.kn*0.001); // set actual value
+                    }
+                   
+                    if(last_guage_mode != gauge_two_mode ){
+                        last_guage_mode = gauge_two_mode;
+                        opts_kn.colorStart = "#aa772a";
+                        opts_kn.colorStop = "#aa772a";
+                        gauge_kn.setOptions(opts_kn);
+                        gauge_kn.maxValue = 10.0;
+                        gauge_kn.setMinValue(-10.0);
+                    }
+                   
+                } else if (gauge_two_mode == "bar") {
+                    $("#gauge_kn_text").html(String(_data.display.kompressordruck) + " BAR");
+                    gauge_kn.set(_data.display.kompressordruck); // set actual value
+                    if(last_guage_mode != gauge_two_mode){
+                        last_guage_mode = gauge_two_mode;
+                        opts_kn.colorStop = "#73fc58";
+                        opts_kn.colorStart = "#73fc58";
+                        gauge_kn.setOptions(opts_kn);
+                        gauge_kn.maxValue = 10.0;
+                        gauge_kn.setMinValue(0.0);
+                       
+                    }
+                } else if (gauge_two_mode == "batt") {
+                    $("#gauge_kn_text").html(String(_data.display.batt_charge) + " V");
+                    gauge_kn.set(_data.display.batt_charge); // set actual value
+                    if(last_guage_mode != gauge_two_mode){
+                        last_guage_mode = gauge_two_mode;
+                        opts_kn.colorStart = "#e755f4";
+                        opts_kn.colorStop = "#e755f4";
+                        gauge_kn.setOptions(opts_kn);
+                        gauge_kn.maxValue = 55.0;
+                        gauge_kn.setMinValue(40.0);
+                    }
+                } else if (gauge_two_mode == "temp") {
+                    $("#gauge_kn_text").html(String(_data.display.temperature) + " &deg;C");
+                    gauge_kn.set(_data.display.temperature); // set actual value
+                    if(last_guage_mode != gauge_two_mode){
+                    last_guage_mode = gauge_two_mode;
+                    opts_kn.colorStart = "#f2ec52";
+                    opts_kn.colorStop = "#f2ec52";
+                    gauge_kn.setOptions(opts_kn);
+                    gauge_kn.maxValue = 120.0;
+                    gauge_kn.setMinValue(-20.0);
+                    }
+                } else {
+                    $("#gauge_kn_text").html(String(_data.display.kn) + "---");
+                }
+
+
+
+
+                if (_data.display.ctlmode != undefined && _data.display.ctlmode != null) {
+                    if (_data.display.ctlmode == 1) {
+                        $("#img_ctlmode").attr("src", "/img/new_icons/icon_150x150_mode_current.png");
+                        if (!chmodeicon_switched) {
+                            sw_gauge_mode_two('kn');
+                            chmodeicon_switched = true;
+                            modecurrentsound.play();
+                        }
+                    } else {
+                        $("#img_ctlmode").attr("src", "/img/new_icons/icon_150x150_mode_rpm.png");
+                        chmodeicon_switched = false;
+                        if(!chmoderpm_switched){
+                            chmoderpm_switched = true;
+                            moderpmsound.play();
+                        }
+                        
+                    }
+                } else {
+                    $("#img_ctlmode").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+
+
+                if (_data.display.kmh != undefined && _data.display.kmh != null) {
+                    if(_data.display.kmh > 15.0){
+                        _data.display.kmh = 15.0;
+                    }
+                    gauge_kmh.set(_data.display.kmh);
+                    
+                    $("#gauge_kmh_text").html(String(_data.display.kmh) + " KMH" + "  |  " + _data.display.vellevl);
+                }
+
+
+                if (_data.display.direction == 1) {
+                    fahrtrichtungtext = "FORWARD";
+                    $("#img_direction").attr("src", "/img/new_icons/icon_150x150_direction_forward.png");
+
+                    if(_data.display.direction != last_direction){
+                        last_direction = _data.display.direction;
+
+                        if(_data.display.direction == 1){
+                            forwardsound.play();
+                        }
+                    }
+
+                } else if (_data.display.direction == 0) {
+                    fahrtrichtungtext = "BACKWARD";
+                    $("#img_direction").attr("src", "/img/new_icons/icon_150x150_direction_backwards.png");
+
+                    if(_data.display.direction != last_direction){
+                        last_direction = _data.display.direction;
+
+                        if(_data.display.direction == 0){
+                            backwardsound.play();
+                        }
+                    }
+
+                } else {
+                    fahrtrichtungtext = "UNKNOWN";
+                    $("#img_direction").attr("src", "/img/new_icons/icon_150x150_undef.png");
+                }
+                //  show_alert(fahrtrichtungtext, !_data.display.direction);
+
+
+                //UPDATE ALERT TEXT
+                if (_data.display.alert_msg != undefined && _data.display.alert_msg != null) {
+                    show_alert(_data.display.alert_msg, false);
+                    if (old_alert_msg != _data.display.alert_msg && String(_data.display.alert_msg) != "") {
+                        old_alert_msg = _data.display.alert_msg;
+                        audio_alert.play();
+                        setTimeout(() => {
+                            show_alert(_data.display.alert_msg, false);
+                            setTimeout(() => {
+                                show_alert(_data.display.alert_msg, true);
+                            }, 1000);
+                        }, 1000);
+                    }
+
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+            $(document).ready(function () {
+                socket = io();
+                socket.on('broadcast', function (data) {
+                    if (data == null) { return; }
+                    //console.log(data);
+                    parse_state_data(data)
+                });
+                socket.emit('event', { 'event': 'startup' });
+            });
+        </script>
+
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<html>
+
+<head>
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>LC</title>
+
+
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/small-business.css" rel="stylesheet">
+
+
+
+    <style>
+        body {
+            background-color: rgb(44, 43, 43);
+        }
+
+        .my-sidebar {
+            -ms-flex: 0 0 800;
+            flex: 0 0 800;
+            background-color: greenyellow;
+        }
+
+        .gauge_text {
+            font-weight: 900;
+            color: aliceblue;
+            font-size: 1.6em;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+
+        <img class="img-responsive" src="/img/embrk.png" 
+        id="img_brkloes_one" onclick="send_notbremse()" />
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="js/204socket.io.js"></script>
+    <script src="js/gauge.js"></script>
+    <script>
+        var socket = null;
+
+        function  send_notbremse(){
+                socket.emit('event', { 'event': 'embreak' });
+            }
+            function hupe(_state){
+                socket.emit('event', { 'event': 'hupe','state':_state });
+            }
+
+
+        $(document).ready(function () {
+            socket = io();
+            socket.on('broadcast', function (data) {
+                if (data == null) {
+                    return;
+                }
+                //console.log(data);
+                parse_state_data(data)
+            });
+            socket.emit('event', {
+                'event': 'startup_em'
+            });
+        });
+    </script>
+
+</body>
+
+</html>
