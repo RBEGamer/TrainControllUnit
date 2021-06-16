@@ -190,9 +190,8 @@ def callbackui(data):
 
 if __name__ == '__main__':
     try:
-
+				#192.168.1.17
         client = ModbusTcpClient("192.168.1.17", port=int(5020))
-
         client.write_coil(6,False, unit=1)
         client.write_coil(7,False, unit=1)
 
