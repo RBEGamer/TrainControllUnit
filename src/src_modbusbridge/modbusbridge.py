@@ -50,7 +50,7 @@ vellevl = 0
 def callbackfb(data_string):
     tmp = json.loads(data_string)
     client.write_register(0, tmp['breaklevel'], unit=1)
-    client.write_register(1, (tmp['velocity']*2)+900, unit=1)
+    client.write_register(28, (tmp['velocity']*2)+900, unit=1)
 
 
 
@@ -156,6 +156,11 @@ def callbackui(data):
             client.write_coil(13, False, unit=1)
             client.write_coil(14, False, unit=1)
 
+    if(tmp['event'] == 'breaklevel'):
+        client.write_register(0, tmp['breaklevel'], unit=1)
+
+    if(tmp['event'] == 'velocity'):
+        client.write_register(28, (tmp['velocity']*2)+900, unit=1)
 
 
 
@@ -241,4 +246,3 @@ if __name__ == '__main__':
         print(e)
         #mqtt_client.close()
         pass
-
