@@ -68,9 +68,20 @@
                 </div>
             </div>
         </div>
+
+
         <div class="col-md-10 col-md-offset-1" style="border:2px solid white;">
-<br>
+            <div class="row">
+                <center>
+                <div class="col-md-12 col-md-offset-1" style="width: 50%" >
+                    <img class="img-responsive img-center" src="/img/new_icons/icon_512x128_Notbremse.png" width="400" id="img_notbremse" onclick="send_notbremse()" />
+                </div>
+            </center>
+            </div>
+
         </div>
+
+
 
         <div class="col-md-1 col-md-offset-1" style="border:2px solid white;">
             <div class="u-cf">
@@ -189,7 +200,9 @@
             socket.emit('event', { 'event': 'breaklevel','state':_s });
         }
 
-
+        function hupe(_state){
+            socket.emit('event', { 'event': 'hupe','state':_state });
+        }
 
 
 
@@ -217,7 +230,10 @@
         }
 
 
-
+        function send_notbremse(){
+            socket.emit('event', { 'event': 'embreak' });
+            enmodecc =0;
+        }
 
 
         function switch_image(_id, _state) {
