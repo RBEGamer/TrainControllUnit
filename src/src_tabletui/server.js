@@ -128,7 +128,8 @@ mqtt_client.on('message', function (topic, message) {
             hupe_state: json.hupe_state,
             storedenergy: json.storedenergy,
             storemode: json.storemode,
-            vellevl: json.vellevl
+            vellevl: json.vellevl,
+            vel:json.vel
 
         }
     });

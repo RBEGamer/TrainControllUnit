@@ -229,6 +229,7 @@ if __name__ == '__main__':
                     "hupe_state":1,
                     "storedenergy":response.registers[25] / 100.0,
                     "storemode": response.registers[27], #0 = 0ff 1= store in 2 = store out
+                    "vel": response.registers[28], #0 = 0ff 1= store in 2 = store out
                     "vellevl":vellevl
 
                 }))
