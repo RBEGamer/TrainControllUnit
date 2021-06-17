@@ -64,7 +64,7 @@
         <div class="col-md-1 col-md-offset-1" style="border:2px solid white;">
             <div class="u-cf">
                 <div class="u-left" style="height:80%">
-                    <input type="range" min="0" id="brkslider" max="4" style="-webkit-appearance: slider-vertical; min-height: 800px; max-height: 1000px;">
+                    <input type="range" value="4" min="0" id="brkslider" max="4" style="-webkit-appearance: slider-vertical; min-height: 800px; max-height: 1000px;">
                 </div>
             </div>
         </div>
@@ -75,7 +75,7 @@
         <div class="col-md-1 col-md-offset-1" style="border:2px solid white;">
             <div class="u-cf">
                 <div class="u-left" style="height: 80%">
-                    <input type="range" id="velslider" min="0" max="100" style="-webkit-appearance: slider-vertical; min-height: 800px; max-height: 1000px;">
+                    <input type="range" value="0" id="velslider" min="0" max="100" style="-webkit-appearance: slider-vertical; min-height: 800px; max-height: 1000px;">
                 </div>
 
             </div>
@@ -235,32 +235,18 @@
         var chmodeicon_switched = false;
         var fire_blink = false;
         function parse_state_data(_data) {
-
             if (_data == null || _data.display == null) {
                 show_alert("DATA STATE PARSING FAILED")
             }
             console.log(_data);
-
             //UPDATE GAUGES
             if (_data.display.breaklevel != undefined && _data.display.breaklevel != null) {
                $("#dispsetbrk").html(_data.display.breaklevel);
             }
-
             if (_data.display.vel != undefined && _data.display.vel != null) {
                 $("#dispsetbrk").html(_data.display.vel);
             }
-
         }
-
-
-
-
-
-
-
-
-
-
 
 
 
