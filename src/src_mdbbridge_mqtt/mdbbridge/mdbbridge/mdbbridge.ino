@@ -21,7 +21,7 @@
 //TIMER VARIABLES
 const long gauge_interval =300;
 unsigned long gauge_previousMillis = 0;
-const long slider_interval = 100;
+const long slider_interval = 200;
 unsigned long slider_previousMillis = 0;
 const long btn_interval = 50;
 unsigned long btn_previousMillis = 0;
@@ -159,20 +159,7 @@ void loop() {
 
   //GAUGE UPDATE LOOP
   unsigned long gauge_currentMillis = millis();
-  if (gauge_currentMillis - gauge_previousMillis >= gauge_interval){        
-        gauge_previousMillis = gauge_currentMillis;
-        //READ MODBUS
-     //   if(mb.readHreg(remote, MB_REGISTER_KMH, &get_velocity_level)){
-     //     gauges_updates = true;
-     //   }
-     //    if(mb.readHreg(remote, MB_REGISTER_KN, &get_break_level)){
-     //     gauges_updates = true;
-     //   }
-     //   if(gauges_updates){
-     //     set_gauge(get_velocity_level,get_break_level);
-     //   }
-     
-  }
+
 
   
    unsigned long slider_currentMillis = millis();
@@ -181,6 +168,7 @@ void loop() {
           read_i2c_slider();
           Serial.printf("set_velocity_level %i set_break_level %i",set_velocity_level,set_break_level);
           Serial.println();
+          if(set_break_level <= 100 && set_break_level >= 0){
           set_break_level_conv = set_break_level;
           if(set_break_level_conv > 80){set_break_level_conv = 4;}
           else if(set_break_level_conv > 50){set_break_level_conv = 3;}
@@ -188,21 +176,32 @@ void loop() {
           else if(set_break_level_conv >15){set_break_level_conv = 1;}
           else if(set_break_level_conv <= 15){set_break_level_conv = 0;}
 
-          if(set_velocity_level != last_set_velocity_level || set_break_level != last_set_break_level){
-            String tmp = "{\"breaklevel\":"+String(set_break_level_conv)+",\"velocity\":"+String(set_velocity_level)+"}";
+          if(set_velocity_level >= 255){
+            }
+          
+          if(set_break_level_conv != last_set_break_level){
+            last_set_break_level = set_break_level_conv;
+            String tmp = "{\"breaklevel\":"+String(set_break_level_conv)+"}";//,\"velocity\":"+String(set_velocity_level)+"}";
             int ssid_len = tmp.length() + 1;
             char ssid_array[ssid_len];
             tmp.toCharArray(ssid_array, ssid_len);
             mqtt_client.publish(MQTT_TOPIC_SEND_EVENT, ssid_array);
           }
-  /*
-          if(!mb.writeHreg(remote, MB_REGISTER_BRKLVL, set_break_level_conv)){
-            Serial.println("MB_REGISTER_BRKLVL SET FAILED");
           }
-          if(!mb.writeHreg(remote, MB_REGISTER_VEL, (2*set_velocity_level)+900)){
-            Serial.println("MB_REGISTER_VEL SET FAILED");
+          if(set_velocity_level <= 100 && set_velocity_level >= 0){
+           
+          set_velocity_level = map(set_velocity_level,0,100,0,50);
+          set_velocity_level = map(set_velocity_level,0,50,0,100);
+          if(set_velocity_level != last_set_velocity_level){
+            last_set_velocity_level = set_velocity_level;
+            String tmp = "{\"velocity\":"+String(set_velocity_level)+"}";//,\"velocity\":"+String(set_velocity_level)+"}";
+            int ssid_len = tmp.length() + 1;
+            char ssid_array[ssid_len];
+            tmp.toCharArray(ssid_array, ssid_len);
+            mqtt_client.publish(MQTT_TOPIC_SEND_EVENT, ssid_array);
           }
-          */
+          }
+
   }
 
 
