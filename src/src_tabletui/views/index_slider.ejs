@@ -193,11 +193,23 @@
 
 
         function setvel(_s){
+            console.log("setvel", _s);
             socket.emit('event', { 'event': 'velocity','state':_s });
         }
 
         function setbrk(_s){
-            socket.emit('event', { 'event': 'breaklevel','state':_s });
+            console.log("setbrk", _s);
+            if(_s == "0"){
+                socket.emit('event', { 'event': 'brkstep0' });
+            }else if(_s == "1"){
+                socket.emit('event', { 'event': 'brkstep1' });
+            }else if(_s == "2"){
+                socket.emit('event', { 'event': 'brkstep2' });
+            }if(_s == "3"){
+                socket.emit('event', { 'event': 'brkstep3' });
+            }if(_s == "4"){
+                socket.emit('event', { 'event': 'brkstep4' });
+            }
         }
 
         function hupe(_state){
@@ -264,9 +276,37 @@
             }
         }
 
+        var zoom = 1;
+        var width = 100;
 
+        function bigger() {
+            zoom = zoom + 0.1;
+            width = 100 / zoom;
+            document.body.style.transformOrigin = "left top";
+            document.body.style.transform = "scale(" + zoom + ")";
+            document.body.style.width = width + "%";
+        }
+        function smaller() {
+            zoom = zoom - 0.1;
+            width = 100 / zoom;
+            document.body.style.transformOrigin = "left top";
+            document.body.style.transform = "scale(" + zoom + ")";
+            document.body.style.width = width + "%";
+        }
+        function scale(_z) {
+            zoom = _z;
+            width = 100 / zoom;
+            document.body.style.transformOrigin = "left top";
+            document.body.style.transform = "scale(" + zoom + ")";
+            document.body.style.width = width + "%";
+        }
 
         $(document).ready(function () {
+
+            scale(1280 / screen.width);
+            smaller();
+
+
             socket = io();
             socket.on('broadcast', function (data) {
                 if (data == null) { return; }
